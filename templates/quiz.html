@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz — VanaOshadhi</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="leaf-icon">🌿</span>
+      <div class="brand-text-block">
+        <span class="brand-text">VanaOshadhi</span>
+        <span class="brand-sub" data-en="Medicinal Plants Encyclopedia" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳ ವಿಶ್ವಕೋಶ">Medicinal Plants Encyclopedia</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">
+        <i class="fas fa-home"></i>
+        <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span>
+      </a>
+      <a href="/quiz" class="nav-link active">
+        <i class="fas fa-question-circle"></i>
+        <span data-en="Quiz" data-kn="ರಸಪ್ರಶ್ನೆ">Quiz</span>
+      </a>
+      <button class="nav-lang-toggle" id="globalLangToggle" onclick="toggleGlobalLang()" title="Switch Language">
+        <span class="lang-flag" id="globalLangFlag">🇮🇳</span>
+        <span class="lang-toggle-text" id="globalLangText">ಕನ್ನಡ</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══ QUIZ HERO ══ -->
+  <header class="quiz-hero">
+    <div class="quiz-hero-content">
+      <div class="hero-badge">🧠 <span data-en="Interactive Botanical Quiz" data-kn="ಸಂವಾದಾತ್ಮಕ ಸಸ್ಯ ರಸಪ್ರಶ್ನೆ">Interactive Botanical Quiz</span></div>
+      <h1 class="hero-title">
+        <span data-en="Medicinal Plants" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳ">Medicinal Plants</span>
+        <span class="hero-highlight"> <span data-en="Quiz" data-kn="ರಸಪ್ರಶ್ನೆ">Quiz</span></span>
+      </h1>
+      <p class="hero-subtitle" data-en="Test your knowledge of botanical wisdom, scientific nomenclature, traditional uses, plant families, and healing remedies."
+         data-kn="ಸಸ್ಯಶಾಸ್ತ್ರೀಯ ಜ್ಞಾನ, ವೈಜ್ಞಾನಿಕ ಹೆಸರುಗಳು, ಸಾಂಪ್ರದಾಯಿಕ ಉಪಯೋಗಗಳು ಮತ್ತು ಆಯುರ್ವೇದ ಸಸ್ಯಗಳ ಕುರಿತು ನಿಮ್ಮ ಜ್ಞಾನವನ್ನು ಪರೀಕ್ಷಿಸಿ.">
+        Test your knowledge of botanical wisdom, scientific nomenclature, traditional uses, plant families, and healing remedies.
+      </p>
+    </div>
+  </header>
+
+  <!-- ══ QUIZ CONTAINER ══ -->
+  <main class="quiz-main">
+
+    <!-- SETUP & START SCREEN -->
+    <div class="quiz-screen glass-card" id="startScreen">
+      <div class="start-icon">🌿</div>
+      <h2 data-en="Customize Your Botanical Quiz" data-kn="ನಿಮ್ಮ ರಸಪ್ರಶ್ನೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ">Customize Your Botanical Quiz</h2>
+      <p data-en="Questions are dynamically generated across our 80-plant encyclopedia — test yourself across identification, scientific taxonomy, Ayurvedic preparations, and uses!"
+         data-kn="ನಮ್ಮ 80 ಸಸ್ಯಗಳ ವಿಶ್ವಕೋಶದಿಂದ ಪ್ರಶ್ನೆಗಳು ಯಾದೃಚ್ಛಿಕವಾಗಿ ಸೃಷ್ಟಿಯಾಗುತ್ತವೆ — ಗುರುತಿಸುವಿಕೆ, ವೈಜ್ಞಾನಿಕ ಹೆಸರು, ಆಯುರ್ವೇದ ಉಪಯೋಗಗಳ ಕುರಿತು ಪರೀಕ್ಷಿಸಿ!">
+        Questions are dynamically generated across our 80-plant encyclopedia — test yourself across identification, scientific taxonomy, Ayurvedic preparations, and uses!
+      </p>
+
+      <!-- DIFFICULTY SELECTOR -->
+      <div class="quiz-config-section">
+        <label class="config-label"><i class="fas fa-layer-group"></i> <span data-en="Select Difficulty Level:" data-kn="ಹಂತವನ್ನು ಆಯ್ಕೆಮಾಡಿ:">Select Difficulty Level:</span></label>
+        <div class="config-options" id="diffOptions">
+          <button type="button" class="config-chip active" data-diff="easy" onclick="setQuizDifficulty('easy', this)">
+            <i class="fas fa-seedling"></i> <span data-en="Easy (Names &amp; Images)" data-kn="ಸುಲಭ (ಹೆಸರುಗಳು &amp; ಚಿತ್ರ)">Easy (Names &amp; Images)</span>
+          </button>
+          <button type="button" class="config-chip" data-diff="medium" onclick="setQuizDifficulty('medium', this)">
+            <i class="fas fa-flask"></i> <span data-en="Medium (Science &amp; Uses)" data-kn="ಮಧ್ಯಮ (ವಿಜ್ಞಾನ &amp; ಉಪಯೋಗ)">Medium (Science &amp; Uses)</span>
+          </button>
+          <button type="button" class="config-chip" data-diff="hard" onclick="setQuizDifficulty('hard', this)">
+            <i class="fas fa-brain"></i> <span data-en="Hard (Taxonomy &amp; Botany)" data-kn="ಕಠಿಣ (ಕುಟುಂಬ &amp; ವರ್ಗೀಕರಣ)">Hard (Taxonomy &amp; Botany)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- QUESTION COUNT SELECTOR -->
+      <div class="quiz-config-section">
+        <label class="config-label"><i class="fas fa-list-ol"></i> <span data-en="Number of Questions:" data-kn="ಪ್ರಶ್ನೆಗಳ ಸಂಖ್ಯೆ:">Number of Questions:</span></label>
+        <div class="config-options" id="countOptions">
+          <button type="button" class="config-chip count-chip active" data-count="5" onclick="setQuizCount(5, this)">5 <span data-en="Questions" data-kn="ಪ್ರಶ್ನೆಗಳು">Questions</span></button>
+          <button type="button" class="config-chip count-chip" data-count="10" onclick="setQuizCount(10, this)">10 <span data-en="Questions" data-kn="ಪ್ರಶ್ನೆಗಳು">Questions</span></button>
+          <button type="button" class="config-chip count-chip" data-count="15" onclick="setQuizCount(15, this)">15 <span data-en="Questions" data-kn="ಪ್ರಶ್ನೆಗಳು">Questions</span></button>
+        </div>
+      </div>
+
+      <!-- Question type preview chips -->
+      <div class="qtype-chips">
+        <span class="qtype-chip chip-image"><i class="fas fa-image"></i> Image ID</span>
+        <span class="qtype-chip chip-use"><i class="fas fa-mortar-pestle"></i> Uses</span>
+        <span class="qtype-chip chip-sci"><i class="fas fa-flask"></i> Science</span>
+        <span class="qtype-chip chip-fam"><i class="fas fa-sitemap"></i> Family</span>
+        <span class="qtype-chip chip-part"><i class="fas fa-spa"></i> Plant Parts</span>
+        <span class="qtype-chip chip-kn"><i class="fas fa-language"></i> Kannada</span>
+      </div>
+
+      <ul class="quiz-rules">
+        <li><i class="fas fa-random" style="color:var(--accent)"></i> <span data-en="Questions and answer choices dynamically shuffled every attempt" data-kn="ಪ್ರತಿ ಬಾರಿ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು ಹೊಸದಾಗಿ ಬದಲಾಗುತ್ತವೆ">Questions and answer choices dynamically shuffled every attempt</span></li>
+        <li><i class="fas fa-check-circle" style="color:var(--accent)"></i> <span data-en="Immediate feedback with educational botanical explanations" data-kn="ಪ್ರತಿ ಪ್ರಶ್ನೆಗೆ ತಕ್ಷಣದ ಶೈಕ್ಷಣಿಕ ವಿವರಣೆ">Immediate feedback with educational botanical explanations</span></li>
+        <li><i class="fas fa-trophy" style="color:var(--gold)"></i> <span data-en="Interactive score ring and question review at completion" data-kn="ರಸಪ್ರಶ್ನೆ ಮುಗಿದ ನಂತರ ಅಂಕಗಳ ಸಮಗ್ರ ವರದಿ">Interactive score ring and question review at completion</span></li>
+      </ul>
+
+      <button class="quiz-btn primary-btn btn-lg" onclick="startCustomQuiz()">
+        <i class="fas fa-play"></i>
+        <span data-en="Start Quiz Now" data-kn="ರಸಪ್ರಶ್ನೆ ಪ್ರಾರಂಭಿಸಿ">Start Quiz Now</span>
+      </button>
+    </div>
+
+    <!-- QUESTION SCREEN -->
+    <div class="quiz-screen glass-card" id="questionScreen" style="display:none;">
+      <!-- Progress bar -->
+      <div class="quiz-progress-bar-wrapper">
+        <div class="quiz-progress-bar" id="progressBar"></div>
+      </div>
+      <!-- Meta row -->
+      <div class="quiz-meta">
+        <span class="q-counter" id="qCounter">Question 1 of 5</span>
+        <span class="q-score"><i class="fas fa-star"></i> <span data-en="Score:" data-kn="ಅಂಕ:">Score:</span> <strong id="liveScore">0</strong></span>
+      </div>
+
+      <!-- Question type badge — injected by JS -->
+      <div class="q-type-badge" id="qTypeBadge"></div>
+
+      <!-- Question text -->
+      <div class="question-text-box" id="questionTextBox"></div>
+
+      <!-- IMAGE container — shown only for image questions with real photos -->
+      <div class="quiz-image-container" id="quizImageContainer" style="display:none;">
+        <img id="quizPlantImg" src="" alt="Identify this medicinal plant" class="quiz-plant-img"
+             onerror="this.src='/static/images/placeholder.svg'"/>
+        <div class="quiz-image-label">
+          <i class="fas fa-search"></i> <span data-en="Observe the leaf, flower, or habit characteristics" data-kn="ಎಲೆ ಅಥವಾ ಹೂವಿನ ಲಕ್ಷಣಗಳನ್ನು ಗಮನಿಸಿ">Observe the leaf, flower, or habit characteristics</span>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="options-grid" id="optionsGrid"></div>
+
+      <!-- Feedback -->
+      <div class="feedback-box" id="feedbackBox" style="display:none;"></div>
+
+      <!-- Next Button -->
+      <button class="quiz-btn primary-btn" id="nextBtn" style="display:none;" onclick="nextQuestion()">
+        <span data-en="Next Question" data-kn="ಮುಂದಿನ ಪ್ರಶ್ನೆ">Next Question</span> <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div class="quiz-screen glass-card" id="resultScreen" style="display:none;">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <h2 class="result-title" id="resultTitle">Quiz Complete!</h2>
+      <div class="result-score-ring">
+        <svg viewBox="0 0 120 120" class="score-ring-svg">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="url(#scoreGrad)" stroke-width="10"
+            stroke-dasharray="314" stroke-dashoffset="314" id="scoreRingCircle"
+            stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:center"/>
+          <defs>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4ade80"/>
+              <stop offset="100%" stop-color="#22c55e"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="score-ring-label">
+          <span class="score-num" id="finalScoreNum">0</span>
+          <span class="score-denom" id="finalScoreDenom">/5</span>
+        </div>
+      </div>
+      <p class="result-message" id="resultMessage"></p>
+      <div class="result-breakdown" id="resultBreakdown"></div>
+      <div class="result-actions">
+        <button class="quiz-btn primary-btn" onclick="restartQuiz()">
+          <i class="fas fa-redo"></i>
+          <span data-en="Try Again" data-kn="ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ">Try Again</span>
+        </button>
+        <a href="/" class="quiz-btn secondary-btn">
+          <i class="fas fa-home"></i>
+          <span data-en="Explore Plants" data-kn="ಸಸ್ಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ">Explore Plants</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-title">🌿 VanaOshadhi — <span data-en="Medicinal Plants Encyclopedia" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳ ವಿಶ್ವಕೋಶ">Medicinal Plants Encyclopedia</span></p>
+      <p class="footer-sub">A Digital Encyclopedia of 80 Medicinal Plants &nbsp;|&nbsp; Traditional Ayurvedic Heritage &amp; Modern Botanical Study</p>
+    </div>
+  </footer>
+
+  <!-- Plant data injected from Flask -->
+  <script>
+    const PLANTS_FOR_QUIZ = {{ plants | tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

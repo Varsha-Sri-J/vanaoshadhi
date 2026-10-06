@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VanaOshadhi — Medicinal Plants Encyclopedia</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="leaf-icon">🌿</span>
+      <div class="brand-text-block">
+        <span class="brand-text">VanaOshadhi</span>
+        <span class="brand-sub" data-en="Medicinal Plants Encyclopedia" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳ ವಿಶ್ವಕೋಶ">Medicinal Plants Encyclopedia</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link active">
+        <i class="fas fa-home"></i>
+        <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-link" id="navFavLink" onclick="filterByFavorites()" title="View Favorites">
+        <i class="fas fa-heart fav-nav-icon"></i>
+        <span data-en="Favorites" data-kn="ಮೆಚ್ಚಿನವು">Favorites</span>
+        <span class="nav-fav-badge" id="navFavBadge" style="display:none;">0</span>
+      </a>
+      <a href="/quiz" class="nav-link">
+        <i class="fas fa-question-circle"></i>
+        <span data-en="Quiz" data-kn="ರಸಪ್ರಶ್ನೆ">Quiz</span>
+      </a>
+      <!-- GLOBAL LANGUAGE TOGGLE -->
+      <button class="nav-lang-toggle" id="globalLangToggle" onclick="toggleGlobalLang()" title="Switch Language">
+        <span class="lang-flag" id="globalLangFlag">🇮🇳</span>
+        <span class="lang-toggle-text" id="globalLangText">ಕನ್ನಡ</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span data-en="🌱 Ayurvedic Wisdom & Botanical Heritage" data-kn="🌱 ಆಯುರ್ವೇದ ಜ್ಞಾನ ಮತ್ತು ಸಸ್ಯ ಸಂಪತ್ತು">🌱 Ayurvedic Wisdom & Botanical Heritage</span>
+      </div>
+      <h1 class="hero-title">
+        <span data-en="Medicinal Plants" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳು">Medicinal Plants</span><br/>
+        <span class="hero-highlight" data-en="Encyclopedia" data-kn="ವಿಶ್ವಕೋಶ">Encyclopedia</span>
+      </h1>
+      <p class="hero-subtitle" data-en="Explore nature's living pharmacy — a comprehensive catalog of 80 verified healing plants, Ayurvedic herbs, traditional trees, and kitchen spices." data-kn="ಪ್ರಕೃತಿಯ ಜೀವಂತ ಔಷಧಾಲಯವನ್ನು ಅನ್ವೇಷಿಸಿ — 80 ದೃಢೀಕೃತ ಗುಣಕಾರಿ ಸಸ್ಯಗಳು, ಆಯುರ್ವೇದ ಗಿಡಮೂಲಿಕೆಗಳು, ಪವಿತ್ರ ಮರಗಳು ಮತ್ತು ಸಾಂಬಾರ ಪದಾರ್ಥಗಳ ಸಮಗ್ರ ಸಂಗ್ರಹ.">
+        Explore nature's living pharmacy — a comprehensive catalog of 80 verified healing plants, Ayurvedic herbs, traditional trees, and kitchen spices.
+      </p>
+
+      <!-- DYNAMIC COLLECTION STATISTICS -->
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number">{{ stats.total_plants }}</span>
+          <span class="stat-label" data-en="Total Plants" data-kn="ಒಟ್ಟು ಸಸ್ಯಗಳು">Total Plants</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">{{ stats.total_families }}</span>
+          <span class="stat-label" data-en="Plant Families" data-kn="ಸಸ್ಯ ಕುಟುಂಬಗಳು">Plant Families</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">{{ stats.herbs }}</span>
+          <span class="stat-label" data-en="Herbs" data-kn="ಗಿಡಮೂಲಿಕೆಗಳು">Herbs</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">{{ stats.trees }}</span>
+          <span class="stat-label" data-en="Trees" data-kn="ಮರಗಳು">Trees</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">{{ stats.ayurvedic }}</span>
+          <span class="stat-label" data-en="Ayurvedic" data-kn="ಆಯುರ್ವೇದ ಸಸ್ಯಗಳು">Ayurvedic</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="floating-leaf leaf-1">🌿</div>
+      <div class="floating-leaf leaf-2">🌳</div>
+      <div class="floating-leaf leaf-3">🌱</div>
+      <div class="floating-leaf leaf-4">☘️</div>
+    </div>
+  </header>
+
+  <!-- ══ EDUCATIONAL DISCLAIMER BANNER ══ -->
+  <aside class="disclaimer-banner" role="note" aria-label="Educational Disclaimer">
+    <div class="disclaimer-box">
+      <i class="fas fa-shield-alt disclaimer-icon"></i>
+      <div class="disclaimer-text">
+        <strong data-en="Educational & Traditional Knowledge Notice:" data-kn="ಶೈಕ್ಷಣಿಕ ಮತ್ತು ಸಾಂಪ್ರದಾಯಿಕ ಜ್ಞಾನದ ಸೂಚನೆ:">Educational & Traditional Knowledge Notice:</strong>
+        <span data-en="This encyclopedia is compiled for educational reference and documenting traditional botanical knowledge. Information presented is not a substitute for professional medical advice, diagnosis, or clinical treatment. Always consult qualified healthcare providers regarding health decisions."
+              data-kn="ಈ ವಿಶ್ವಕೋಶವನ್ನು ಶೈಕ್ಷಣಿಕ ಮಾಹಿತಿ ಮತ್ತು ಸಾಂಪ್ರದಾಯಿಕ ಗಿಡಮೂಲಿಕೆ ಜ್ಞಾನದ ಅಧ್ಯಯನಕ್ಕಾಗಿ ಸಂಗ್ರಹಿಸಲಾಗಿದೆ. ಇದು ಯಾವುದೇ ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆಗೆ ಪರ್ಯಾಯವಲ್ಲ. ಆರೋಗ್ಯ ಸಮಸ್ಯೆಗಳಿಗೆ ಅರ್ಹ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.">
+          This encyclopedia is compiled for educational reference and documenting traditional botanical knowledge. Information presented is not a substitute for professional medical advice, diagnosis, or clinical treatment. Always consult qualified healthcare providers regarding health decisions.
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ SEARCH & FILTERS SECTION ══ -->
+  <section class="search-section" aria-label="Search and Filter Plants">
+    <!-- Search Bar -->
+    <div class="search-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" id="searchInput" class="search-input"
+        data-placeholder-en="Search by common, scientific, Kannada, Hindi name, family, use, or tag…"
+        data-placeholder-kn="ಹೆಸರು, ವೈಜ್ಞಾನಿಕ, ಕನ್ನಡ, ಹಿಂದಿ ಹೆಸರು, ಕುಟುಂಬ ಅಥವಾ ಉಪಯೋಗದಿಂದ ಹುಡುಕಿ…"
+        placeholder="Search by common, scientific, Kannada, Hindi name, family, use, or tag…"
+        oninput="filterPlants()"/>
+      <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" title="Clear search" style="display:none;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="filters-container">
+      <div class="filter-group">
+        <span class="filter-label"><i class="fas fa-th-large"></i> <span data-en="Category:" data-kn="ವರ್ಗ:">Category:</span></span>
+        <div class="filter-chips" id="categoryChips">
+          <button class="filter-chip active" data-category="all" onclick="selectCategory('all', this)">
+            <span data-en="🌿 All" data-kn="🌿 ಎಲ್ಲವೂ">🌿 All</span>
+          </button>
+          <button class="filter-chip fav-chip" data-category="favorites" onclick="selectCategory('favorites', this)">
+            <i class="fas fa-heart"></i> <span data-en="My Favorites" data-kn="ನನ್ನ ಮೆಚ್ಚಿನವು">My Favorites</span>
+            <span class="fav-count-pill" id="favCountPill" style="display:none;">0</span>
+          </button>
+          <button class="filter-chip" data-category="herb" onclick="selectCategory('herb', this)">
+            <span data-en="🌿 Herbs" data-kn="🌿 ಗಿಡಮೂಲಿಕೆಗಳು">🌿 Herbs</span>
+          </button>
+          <button class="filter-chip" data-category="tree" onclick="selectCategory('tree', this)">
+            <span data-en="🌳 Trees" data-kn="🌳 ಮರಗಳು">🌳 Trees</span>
+          </button>
+          <button class="filter-chip" data-category="shrub" onclick="selectCategory('shrub', this)">
+            <span data-en="🌱 Shrubs" data-kn="🌱 ಪೊದೆಗಳು">🌱 Shrubs</span>
+          </button>
+          <button class="filter-chip" data-category="climber" onclick="selectCategory('climber', this)">
+            <span data-en="🪴 Climbers" data-kn="🪴 ಬಳ್ಳಿಗಳು">🪴 Climbers</span>
+          </button>
+          <button class="filter-chip" data-category="flower" onclick="selectCategory('flower', this)">
+            <span data-en="🌸 Flowers" data-kn="🌸 ಹೂವುಗಳು">🌸 Flowers</span>
+          </button>
+          <button class="filter-chip" data-category="fruit" onclick="selectCategory('fruit', this)">
+            <span data-en="🍎 Fruits" data-kn="🍎 ಹಣ್ಣುಗಳು">🍎 Fruits</span>
+          </button>
+          <button class="filter-chip" data-category="ayurvedic" onclick="selectCategory('ayurvedic', this)">
+            <span data-en="🌾 Ayurvedic" data-kn="🌾 ಆಯುರ್ವೇದ">🌾 Ayurvedic</span>
+          </button>
+          <button class="filter-chip" data-category="aromatic" onclick="selectCategory('aromatic', this)">
+            <span data-en="🍃 Aromatic" data-kn="🍃 ಸುಗಂಧ ಸಸ್ಯ">🍃 Aromatic</span>
+          </button>
+          <button class="filter-chip" data-category="kitchen" onclick="selectCategory('kitchen', this)">
+            <span data-en="🥣 Kitchen Plants" data-kn="🥣 ಅಡುಗೆಮನೆ ಸಸ್ಯ">🥣 Kitchen Plants</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Plant Part Filters -->
+      <div class="filter-group">
+        <span class="filter-label"><i class="fas fa-seedling"></i> <span data-en="Plant Part:" data-kn="ಸಸ್ಯದ ಭಾಗ:">Plant Part:</span></span>
+        <div class="filter-chips" id="partChips">
+          <button class="part-chip active" data-part="all" onclick="selectPart('all', this)">
+            <span data-en="All Parts" data-kn="ಎಲ್ಲಾ ಭಾಗಗಳು">All Parts</span>
+          </button>
+          <button class="part-chip" data-part="leaves" onclick="selectPart('leaves', this)">
+            <span data-en="Leaves" data-kn="ಎಲೆಗಳು">Leaves</span>
+          </button>
+          <button class="part-chip" data-part="roots" onclick="selectPart('roots', this)">
+            <span data-en="Roots" data-kn="ಬೇರುಗಳು">Roots</span>
+          </button>
+          <button class="part-chip" data-part="flowers" onclick="selectPart('flowers', this)">
+            <span data-en="Flowers" data-kn="ಹೂವುಗಳು">Flowers</span>
+          </button>
+          <button class="part-chip" data-part="fruits" onclick="selectPart('fruits', this)">
+            <span data-en="Fruits" data-kn="ಹಣ್ಣುಗಳು">Fruits</span>
+          </button>
+          <button class="part-chip" data-part="seeds" onclick="selectPart('seeds', this)">
+            <span data-en="Seeds" data-kn="ಬೀಜಗಳು">Seeds</span>
+          </button>
+          <button class="part-chip" data-part="bark" onclick="selectPart('bark', this)">
+            <span data-en="Bark" data-kn="ತೊಗಟೆ">Bark</span>
+          </button>
+          <button class="part-chip" data-part="rhizome" onclick="selectPart('rhizome', this)">
+            <span data-en="Rhizomes" data-kn="ಗೆಡ್ಡೆ / ಕೊಂಬು">Rhizomes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters & Result Count Bar -->
+    <div class="results-bar">
+      <div class="results-count">
+        <i class="fas fa-filter"></i>
+        <span id="resultsTextEn">Showing <strong id="visibleCount">{{ plants|length }}</strong> of <strong>{{ plants|length }}</strong> plants</span>
+        <span id="resultsTextKn" style="display:none;"><strong id="visibleCountKn">{{ plants|length }}</strong> / <strong>{{ plants|length }}</strong> ಸಸ್ಯಗಳನ್ನು ತೋರಿಸಲಾಗುತ್ತಿದೆ</span>
+      </div>
+      <button class="clear-filters-btn" id="clearFiltersBtn" onclick="clearAllFilters()" style="display:none;">
+        <i class="fas fa-times-circle"></i>
+        <span data-en="Clear All Filters" data-kn="ಎಲ್ಲಾ ಫಿಲ್ಟರ್ ತೆಗೆದುಹಾಕಿ">Clear All Filters</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ PLANTS GRID ══ -->
+  <main class="plants-section">
+    <h2 class="section-title">
+      <span data-en="Our Plant Collection" data-kn="ನಮ್ಮ ಸಸ್ಯ ಸಂಗ್ರಹ">Our Plant Collection</span>
+      <span class="title-decoration"></span>
+    </h2>
+
+    <div class="plants-grid" id="plantsGrid">
+      {% for plant in plants %}
+      <div class="plant-card"
+        data-id="{{ plant.id }}"
+        data-name="{{ plant.name|lower }}"
+        data-kannada="{{ plant.kannada_name }}"
+        data-scientific="{{ plant.scientific_name|lower }}"
+        data-hindi="{{ plant.hindi_name|lower }}"
+        data-family="{{ plant.family|lower }}"
+        data-type="{{ plant.plant_type|lower }}"
+        data-region="{{ plant.region|lower }}"
+        data-use="{{ plant.use|lower }}"
+        data-traditional="{{ plant.traditional_uses|join(' ')|lower }}"
+        data-parts="{{ plant.parts_used|join(' ')|lower }}"
+        data-tags="{{ plant.tags|join(' ')|lower }}"
+        data-has-custom-img="{% if plant.images[0] != 'placeholder.svg' %}true{% else %}false{% endif %}">
+
+        <!-- Favorite Button -->
+        <button class="card-fav-btn"
+          id="fav-btn-{{ plant.id }}"
+          onclick="toggleCardFavorite(event, {{ plant.id }})"
+          aria-label="Add to favorites"
+          title="Save plant to favorites">
+          <i class="far fa-heart"></i>
+        </button>
+
+        <div class="card-image-wrapper">
+          <img
+            src="{{ url_for('static', filename='images/' + plant.images[0]) }}"
+            alt="{{ plant.name }}"
+            class="card-img"
+            loading="lazy"
+            onerror="this.src='{{ url_for('static', filename='images/placeholder.svg') }}'"/>
+          <div class="card-image-overlay">
+            <span class="region-tag">
+              <i class="fas fa-map-marker-alt"></i> {{ plant.region.split(',')[0] }}
+            </span>
+          </div>
+
+          <!-- Subtle Specimen Tag for plants pending custom photos -->
+          {% if plant.images[0] == 'placeholder.svg' %}
+          <div class="card-specimen-badge" title="Botanical reference entry">
+            <i class="fas fa-book-open"></i> Reference Profile
+          </div>
+          {% endif %}
+
+          <div class="card-img-zoom-hint">
+            <i class="fas fa-expand-alt"></i>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="card-header-row">
+            <h3 class="card-title card-name-en">{{ plant.name }}</h3>
+            <span class="kannada-name card-name-kn" style="display:none;">{{ plant.kannada_name }}</span>
+            <span class="card-type-pill">{{ plant.plant_type }}</span>
+          </div>
+          <p class="card-scientific"><em>{{ plant.scientific_name }}</em></p>
+          <p class="card-family-hindi">
+            <span class="card-fam-text"><i class="fas fa-seedling"></i> {{ plant.family.split('(')[0].strip() }}</span>
+            {% if plant.hindi_name %}
+            <span class="card-hindi-text">&bull; {{ plant.hindi_name.split('/')[0].split('(')[0].strip() }}</span>
+            {% endif %}
+          </p>
+          <p class="card-use">{{ plant.use[:92] }}…</p>
+
+          <div class="card-tags">
+            <span class="tag taste-tag"><i class="fas fa-leaf"></i> {{ plant.taste.split(',')[0] }}</span>
+            {% if plant.parts_used %}
+            <span class="tag parts-tag"><i class="fas fa-mortar-pestle"></i> {{ plant.parts_used[0] }}</span>
+            {% endif %}
+          </div>
+
+          <a href="/plant/{{ plant.id }}" class="explore-btn">
+            <span data-en="Explore Plant" data-kn="ಸಸ್ಯ ಅನ್ವೇಷಿಸಿ">Explore Plant</span>
+            <i class="fas fa-arrow-right btn-arrow"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- No results state -->
+    <div class="no-results" id="noResults" style="display:none;">
+      <div class="no-results-icon">🍃</div>
+      <h3 data-en="No medicinal plants found" data-kn="ಯಾವುದೇ ಸಸ್ಯಗಳು ಕಂಡುಬಂದಿಲ್ಲ">No medicinal plants found</h3>
+      <p data-en="Try searching for a different plant name, botanical use, or clear your selected filters."
+         data-kn="ದಯವಿಟ್ಟು ಬೇರೆ ಸಸ್ಯದ ಹೆಸರು ಅಥವಾ ಉಪಯೋಗದಿಂದ ಹುಡುಕಿ, ಅಥವಾ ಫಿಲ್ಟರ್‌ಗಳನ್ನು ತೆಗೆದುಹಾಕಿ.">
+        Try searching for a different plant name, botanical use, or clear your selected filters.
+      </p>
+      <button class="quiz-btn primary-btn" onclick="clearAllFilters()">
+        <i class="fas fa-undo"></i>
+        <span data-en="Reset All Filters" data-kn="ಎಲ್ಲಾ ಫಿಲ್ಟರ್ ಮರುಹೊಂದಿಸಿ">Reset All Filters</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-title">🌿 VanaOshadhi — <span data-en="Medicinal Plants Encyclopedia" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳ ವಿಶ್ವಕೋಶ">Medicinal Plants Encyclopedia</span></p>
+      <p class="footer-sub">A Digital Encyclopedia of 80 Medicinal Plants &nbsp;|&nbsp; Traditional Ayurvedic Heritage &amp; Modern Botanical Study</p>
+      <p class="footer-disclaimer-small" data-en="Disclaimer: Educational and research purpose only. Not intended as medical advice." data-kn="ಸೂಚನೆ: ಶೈಕ್ಷಣಿಕ ಮತ್ತು ಸಂಶೋಧನಾ ಉದ್ದೇಶಗಳಿಗಾಗಿ ಮಾತ್ರ. ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆಯಲ್ಲ.">
+        Disclaimer: Educational and research purpose only. Not intended as medical advice.
+      </p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ plant.name }} ({{ plant.scientific_name }}) — VanaOshadhi</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body class="detail-body">
+
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="leaf-icon">🌿</span>
+      <div class="brand-text-block">
+        <span class="brand-text">VanaOshadhi</span>
+        <span class="brand-sub" data-en="Medicinal Plants Encyclopedia" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳ ವಿಶ್ವಕೋಶ">Medicinal Plants Encyclopedia</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">
+        <i class="fas fa-home"></i>
+        <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span>
+      </a>
+      <a href="/quiz" class="nav-link">
+        <i class="fas fa-question-circle"></i>
+        <span data-en="Quiz" data-kn="ರಸಪ್ರಶ್ನೆ">Quiz</span>
+      </a>
+      <button class="nav-lang-toggle" id="globalLangToggle" onclick="toggleGlobalLang()" title="Switch Language">
+        <span class="lang-flag" id="globalLangFlag">🇮🇳</span>
+        <span class="lang-toggle-text" id="globalLangText">ಕನ್ನಡ</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══ BACK ROW & ACTION BUTTONS ══ -->
+  <div class="back-row">
+    <a href="/" class="back-btn">
+      <i class="fas fa-arrow-left"></i>
+      <span data-en="Back to Encyclopedia" data-kn="ವಿಶ್ವಕೋಶಕ್ಕೆ ಹಿಂತಿರುಗಿ">Back to Encyclopedia</span>
+    </a>
+    <div class="detail-actions-right">
+      <!-- Detail Favorite Button -->
+      <button class="detail-fav-btn" id="detailFavBtn" onclick="toggleDetailFavorite({{ plant.id }})" aria-label="Save to favorites">
+        <i class="far fa-heart" id="detailFavIcon"></i>
+        <span id="detailFavText" data-en="Add to Favorites" data-kn="ಮೆಚ್ಚಿನವುಗಳಿಗೆ ಸೇರಿಸಿ">Add to Favorites</span>
+      </button>
+      <div class="breadcrumb">
+        <span data-en="Plant Profile" data-kn="ಸಸ್ಯ ವಿವರ">Plant Profile</span> &bull; #{{ plant.id }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DETAIL MAIN ══ -->
+  <main class="detail-main">
+    <article class="detail-card glass-card">
+
+      <!-- Title block -->
+      <header class="detail-title-block">
+        <div class="detail-badge-group">
+          <span class="detail-badge"><i class="fas fa-leaf"></i> {{ plant.plant_type }}</span>
+          {% if plant.images[0] == 'placeholder.svg' %}
+          <span class="detail-badge badge-specimen"><i class="fas fa-book-open"></i> Botanical Reference Entry</span>
+          {% endif %}
+        </div>
+        <h1 class="detail-plant-name" id="plantName">{{ plant.name }}</h1>
+        <p class="detail-kannada-name" id="kannadaName">{{ plant.kannada_name }}</p>
+        <p class="detail-scientific">
+          <i class="fas fa-flask"></i> <em>{{ plant.scientific_name }}</em>
+          {% if plant.hindi_name %}
+          &nbsp;&bull;&nbsp; <span class="detail-hindi"><i class="fas fa-language"></i> {{ plant.hindi_name }}</span>
+          {% endif %}
+        </p>
+      </header>
+
+      <!-- ══ IMAGE GALLERY ══ -->
+      <section class="gallery-section" aria-label="Plant Photo Gallery">
+        <div class="gallery-main">
+          <img
+            id="mainGalleryImg"
+            src="{{ url_for('static', filename='images/' + plant.images[0]) }}"
+            alt="{{ plant.name }}"
+            class="gallery-main-img"
+            onerror="this.src='{{ url_for('static', filename='images/placeholder.svg') }}'"/>
+          <div class="gallery-overlay-bar">
+            <span class="gallery-caption" id="galleryCaption">1 / {{ plant.images|length }}</span>
+            {% if plant.images|length > 1 %}
+            <span class="gallery-nav">
+              <button class="gal-nav-btn" onclick="galleryPrev()" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+              <button class="gal-nav-btn" onclick="galleryNext()" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+            </span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if plant.images|length > 1 %}
+        <div class="gallery-thumbs" id="galleryThumbs">
+          {% for img in plant.images %}
+          <div class="gallery-thumb-wrap {% if loop.first %}active-thumb{% endif %}"
+               onclick="switchImageIdx({{ loop.index0 }})"
+               title="View photo {{ loop.index }}">
+            <img
+              src="{{ url_for('static', filename='images/' + img) }}"
+              alt="{{ plant.name }} photo {{ loop.index }}"
+              class="gallery-thumb"
+              onerror="this.src='{{ url_for('static', filename='images/placeholder.svg') }}'"/>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </section>
+
+      <!-- ══ QUICK FACTS BAR ══ -->
+      <section class="quick-facts-box" aria-label="Quick Facts">
+        <h2 class="section-heading-sm">
+          <i class="fas fa-bolt"></i>
+          <span data-en="Quick Botanical Facts" data-kn="ಸಂಕ್ಷಿಪ್ತ ಸಸ್ಯ ವಿವರಗಳು">Quick Botanical Facts</span>
+        </h2>
+        <div class="quick-facts-grid">
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Scientific Name" data-kn="ವೈಜ್ಞಾನಿಕ ಹೆಸರು">Scientific Name</span>
+            <span class="qfact-value"><em>{{ plant.scientific_name }}</em></span>
+          </div>
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Botanical Family" data-kn="ಸಸ್ಯ ಕುಟುಂಬ">Botanical Family</span>
+            <span class="qfact-value">{{ plant.family }}</span>
+          </div>
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Plant Type" data-kn="ಸಸ್ಯದ ವರ್ಗ">Plant Type</span>
+            <span class="qfact-value">{{ plant.plant_type }}</span>
+          </div>
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Kannada / Local" data-kn="ಕನ್ನಡ ಹೆಸರು">Kannada / Local</span>
+            <span class="qfact-value highlight-kn">{{ plant.kannada_name }}</span>
+          </div>
+          {% if plant.hindi_name %}
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Hindi Name" data-kn="ಹಿಂದಿ ಹೆಸರು">Hindi Name</span>
+            <span class="qfact-value">{{ plant.hindi_name }}</span>
+          </div>
+          {% endif %}
+          {% if plant.parts_used %}
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Parts Used" data-kn="ಬಳಸುವ ಭಾಗಗಳು">Parts Used</span>
+            <span class="qfact-value">{{ plant.parts_used|join(', ') }}</span>
+          </div>
+          {% endif %}
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Taste Profile" data-kn="ರುಚಿ">Taste Profile</span>
+            <span class="qfact-value">{{ plant.taste }}</span>
+          </div>
+          {% if plant.traditional_systems %}
+          <div class="qfact-item">
+            <span class="qfact-label" data-en="Traditional Systems" data-kn="ವೈದ್ಯ ಪದ್ಧತಿಗಳು">Traditional Systems</span>
+            <span class="qfact-value">{{ plant.traditional_systems|join(', ') }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- ══ STRUCTURED SECTIONS ══ -->
+      <div class="detail-sections-container">
+
+        <!-- 🌿 Overview & Uses -->
+        <section class="detail-section" id="sectionOverview">
+          <h2 class="detail-section-title">
+            <i class="fas fa-leaf"></i>
+            <span data-en="Overview & Traditional Use" data-kn="ಅವಲೋಕನ ಮತ್ತು ಉಪಯೋಗ">Overview & Traditional Use</span>
+          </h2>
+          <p class="uses-text" id="usesText">{{ plant.use }}</p>
+        </section>
+
+        <!-- 🧪 Specific Traditional Uses List -->
+        {% if plant.traditional_uses %}
+        <section class="detail-section" id="sectionTradUses">
+          <h2 class="detail-section-title">
+            <i class="fas fa-mortar-pestle"></i>
+            <span data-en="Documented Traditional Uses" data-kn="ದಾಖಲಿತ ಸಾಂಪ್ರದಾಯಿಕ ಉಪಯೋಗಗಳು">Documented Traditional Uses</span>
+          </h2>
+          <ul class="bullet-list">
+            {% for item in plant.traditional_uses %}
+            <li><i class="fas fa-check-circle bullet-icon"></i> <span>{{ item }}</span></li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+
+        <!-- 🥣 Traditional Preparations -->
+        {% if plant.traditional_preparations %}
+        <section class="detail-section" id="sectionPreps">
+          <h2 class="detail-section-title">
+            <i class="fas fa-flask"></i>
+            <span data-en="Traditional Preparations" data-kn="ಸಾಂಪ್ರದಾಯಿಕ ಔಷಧೀಯ ರೂಪಗಳು">Traditional Preparations</span>
+          </h2>
+          <div class="pill-cloud">
+            {% for prep in plant.traditional_preparations %}
+            <span class="prep-pill"><i class="fas fa-seedling"></i> {{ prep }}</span>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- 🍃 Parts Used -->
+        {% if plant.parts_used %}
+        <section class="detail-section" id="sectionParts">
+          <h2 class="detail-section-title">
+            <i class="fas fa-spa"></i>
+            <span data-en="Medicinal Parts Used" data-kn="ಬಳಸಲಾಗುವ ಸಸ್ಯದ ಭಾಗಗಳು">Medicinal Parts Used</span>
+          </h2>
+          <div class="pill-cloud">
+            {% for part in plant.parts_used %}
+            <span class="part-pill"><i class="fas fa-check"></i> {{ part }}</span>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- 🌱 Key Compounds & Phytochemistry -->
+        {% if plant.key_compounds %}
+        <section class="detail-section" id="sectionCompounds">
+          <h2 class="detail-section-title">
+            <i class="fas fa-atom"></i>
+            <span data-en="Key Phytochemical Compounds" data-kn="ಪ್ರಮುಖ ಸಸ್ಯ ರಾಸಾಯನಿಕ ಸಂಯುಕ್ತಗಳು">Key Phytochemical Compounds</span>
+          </h2>
+          <div class="pill-cloud">
+            {% for compound in plant.key_compounds %}
+            <span class="compound-pill"><i class="fas fa-microscope"></i> {{ compound }}</span>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- 🌍 Habitat & Distribution -->
+        {% if plant.habitat or plant.region %}
+        <section class="detail-section" id="sectionHabitat">
+          <h2 class="detail-section-title">
+            <i class="fas fa-globe-asia"></i>
+            <span data-en="Habitat & Geographic Distribution" data-kn="ನೈಸರ್ಗಿಕ ಆವಾಸಸ್ಥಾನ ಮತ್ತು ಹರಡುವಿಕೆ">Habitat & Geographic Distribution</span>
+          </h2>
+          <div class="info-card-content">
+            {% if plant.origin %}<p><strong><span data-en="Botanical Origin:" data-kn="ಮೂಲ:">Botanical Origin:</span></strong> {{ plant.origin }}</p>{% endif %}
+            {% if plant.region %}<p><strong><span data-en="Geographic Range:" data-kn="ಪ್ರದೇಶ:">Geographic Range:</span></strong> {{ plant.region }}</p>{% endif %}
+            {% if plant.habitat %}<p><strong><span data-en="Natural Habitat:" data-kn="ಆವಾಸಸ್ಥಾನ:">Natural Habitat:</span></strong> {{ plant.habitat }}</p>{% endif %}
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- 🌞 Growing & Cultivation Information -->
+        {% if plant.growing and (plant.growing.soil or plant.growing.sunlight or plant.growing.watering) %}
+        <section class="detail-section" id="sectionGrowing">
+          <h2 class="detail-section-title">
+            <i class="fas fa-sun"></i>
+            <span data-en="Growing & Cultivation Profile" data-kn="ಬೆಳೆಸುವ ಮತ್ತು ಪೋಷಣೆಯ ಮಾಹಿತಿ">Growing & Cultivation Profile</span>
+          </h2>
+          <div class="growing-grid">
+            {% if plant.growing.soil %}
+            <div class="growing-card">
+              <span class="growing-icon">🪴</span>
+              <strong><span data-en="Soil" data-kn="ಮಣ್ಣು">Soil</span></strong>
+              <p>{{ plant.growing.soil }}</p>
+            </div>
+            {% endif %}
+            {% if plant.growing.sunlight %}
+            <div class="growing-card">
+              <span class="growing-icon">☀️</span>
+              <strong><span data-en="Sunlight" data-kn="ಬಿಸಿಲು">Sunlight</span></strong>
+              <p>{{ plant.growing.sunlight }}</p>
+            </div>
+            {% endif %}
+            {% if plant.growing.watering %}
+            <div class="growing-card">
+              <span class="growing-icon">💧</span>
+              <strong><span data-en="Watering" data-kn="ನೀರು">Watering</span></strong>
+              <p>{{ plant.growing.watering }}</p>
+            </div>
+            {% endif %}
+            {% if plant.growing.climate %}
+            <div class="growing-card">
+              <span class="growing-icon">🌡️</span>
+              <strong><span data-en="Climate" data-kn="ಹವಾಮಾನ">Climate</span></strong>
+              <p>{{ plant.growing.climate }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- ⚠️ Safety & Precautions -->
+        {% if plant.safety_notes %}
+        <section class="detail-section safety-section" id="sectionSafety">
+          <h2 class="detail-section-title safety-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span data-en="Safety Precautions & Guidance" data-kn="ಮುನ್ನೆಚ್ಚರಿಕೆ ಮತ್ತು ಸುರಕ್ಷತಾ ಮಾರ್ಗದರ್ಶನ">Safety Precautions & Guidance</span>
+          </h2>
+          <div class="safety-box">
+            <p>{{ plant.safety_notes }}</p>
+          </div>
+        </section>
+        {% endif %}
+
+        <!-- 📚 References & Classical Sources -->
+        {% if plant.references %}
+        <section class="detail-section" id="sectionReferences">
+          <h2 class="detail-section-title">
+            <i class="fas fa-book"></i>
+            <span data-en="Classical References & Sources" data-kn="ಶಾಸ್ತ್ರೀಯ ಆಕರ ಗ್ರಂಥಗಳು ಮತ್ತು ಮೂಲಗಳು">Classical References & Sources</span>
+          </h2>
+          <ul class="references-list">
+            {% for ref in plant.references %}
+            <li><i class="fas fa-bookmark"></i> <span>{{ ref }}</span></li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+
+      </div><!-- /detail-sections-container -->
+
+      <!-- ══ FUN FACT — reveal on hover / click ══ -->
+      <div class="funfact-reveal-wrapper" id="funFactWrapper">
+        <div class="funfact-prompt" id="funFactPrompt" onclick="revealFunFact()">
+          <span class="funfact-prompt-icon">🌱</span>
+          <span class="funfact-prompt-text" data-en="Hover or tap to discover a plant secret…" data-kn="ಸಸ್ಯದ ರಹಸ್ಯ ತಿಳಿಯಲು ಸ್ಪರ್ಶಿಸಿ…">Hover or tap to discover a plant secret…</span>
+          <span class="funfact-prompt-arrow"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="funfact-box" id="funFactBox">
+          <div class="funfact-icon-big">💡</div>
+          <div class="funfact-content">
+            <strong class="funfact-label" data-en="Fun Fact" data-kn="ಆಸಕ್ತಿಕರ ಸಂಗತಿ">Fun Fact</strong>
+            <p id="funFactText">{{ plant.fun_fact }}</p>
+          </div>
+        </div>
+      </div>
+
+    </article><!-- /detail-card -->
+
+    <!-- ══ PLANTS CONNECTED TO {{ plant.name }} ══ -->
+    {% if related_plants %}
+    <section class="related-section" id="connectedPlantsSection" aria-label="Plants Connected to {{ plant.name }}">
+      <div class="section-title-wrap">
+        <h2 class="related-title">
+          <i class="fas fa-network-wired"></i>
+          <span data-en="Plants Connected to {{ plant.name }}" data-kn="{{ plant.kannada_name }} ಜೊತೆ ಸಂಬಂಧಿಸಿದ ಸಸ್ಯಗಳು">Plants Connected to {{ plant.name }}</span>
+        </h2>
+        <p class="relation-disclaimer">
+          <i class="fas fa-info-circle"></i>
+          <span data-en="Relationship Score is an explainable botanical attribute similarity index based on shared family, plant type, parts used, traditional systems, habitat, and documented tags. It is not medical advice."
+                data-kn="ಸಂಬಂಧದ ಶ್ರೇಣಿಯು ಸಸ್ಯ ಕುಟುಂಬ, ಬೆಳವಣಿಗೆಯ ವಿಧ, ಬಳಸುವ ಭಾಗಗಳು ಮತ್ತು ವೈದ್ಯ ಪದ್ಧತಿಗಳ ಸಾಮ್ಯತೆಯ ಆಧಾರದ ಮೇಲಿನ ಶ್ರೇಣಿಯಾಗಿದೆ. ಇದು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆಯಲ್ಲ.">
+            Relationship Score is an explainable botanical attribute similarity index based on shared family, plant type, parts used, traditional systems, habitat, and documented tags. It is not medical advice.
+          </span>
+        </p>
+      </div>
+
+      <div class="related-grid">
+        {% for rel in related_plants %}
+        {% set p_item = rel.plant if rel.plant is defined else rel %}
+        <div class="related-card glass-card">
+          <div class="related-img-wrap">
+            <img
+              src="{{ url_for('static', filename='images/' + p_item.images[0]) }}"
+              alt="{{ p_item.name }}"
+              class="related-img"
+              onerror="this.src='{{ url_for('static', filename='images/placeholder.svg') }}'"/>
+            {% if rel.similarity_score is defined %}
+            <span class="rel-score-badge" title="Botanical Relationship Score">
+              <i class="fas fa-project-diagram"></i> {{ rel.similarity_score }}% Match
+            </span>
+            {% endif %}
+          </div>
+          <div class="related-body">
+            <div class="related-title-box">
+              <h3 class="related-name">{{ p_item.name }}</h3>
+              <span class="related-kn-name">{{ p_item.kannada_name }}</span>
+            </div>
+            <p class="related-sci"><em>{{ p_item.scientific_name }}</em></p>
+            <p class="related-fam">{{ p_item.family.split('(')[0].strip() }} &bull; {{ p_item.plant_type }}</p>
+
+            {% if rel.reasons is defined and rel.reasons %}
+            <div class="related-reasons">
+              <span class="reasons-label" data-en="Relationship Factors:" data-kn="ಸಂಬಂಧದ ಕಾರಣಗಳು:">Relationship Factors:</span>
+              <ul class="reasons-list">
+                {% for reason in rel.reasons %}
+                <li><i class="fas fa-check-circle"></i> <span>{{ reason }}</span></li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <a href="/plant/{{ p_item.id }}" class="related-btn explore-btn">
+              <span data-en="Explore Plant" data-kn="ಸಸ್ಯದ ವಿವರ ತಿಳಿಯಿರಿ">Explore Plant</span> <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ══ PLANT KNOWLEDGE NETWORK ══ -->
+    <section class="network-section glass-card" id="knowledgeNetworkSection" aria-label="Plant Knowledge Network">
+      <div class="network-header">
+        <h2 class="network-title">
+          <i class="fas fa-diagram-project"></i>
+          <span data-en="Plant Knowledge Network" data-kn="ಸಸ್ಯ ಜ್ಞಾನ ಜಾಲ (ನಾಲೆಡ್ಜ್ ನೆಟ್‌ವರ್ಕ್)">Plant Knowledge Network</span>
+        </h2>
+        <p class="network-subtitle"
+           data-en="Interactive botanical graph centering on {{ plant.name }} and surrounding connected flora. Click any node to navigate to its profile."
+           data-kn="{{ plant.name }} ಸಸ್ಯದೊಂದಿಗೆ ಸಂಬಂಧ ಹೊಂದಿರುವ ಇತರ ಸಸ್ಯಗಳ ಪರಸ್ಪರ ಜಾಲ. ವೀಕ್ಷಿಸಲು ಸಸ್ಯದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.">
+          Interactive botanical graph centering on {{ plant.name }} and surrounding connected flora. Click any node to navigate to its profile.
+        </p>
+      </div>
+
+      <div class="network-viewport" id="networkViewport">
+        <!-- Responsive SVG Graph Container -->
+        <svg id="knowledgeGraphSvg" class="knowledge-graph-svg" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive botanical relationship network">
+          <!-- Rendered dynamically by script.js -->
+        </svg>
+
+        <!-- Hover info card for connection details -->
+        <div id="networkHoverCard" class="network-hover-card" style="display:none;" aria-live="polite">
+          <div class="nhc-title" id="nhcTitle"></div>
+          <div class="nhc-sci" id="nhcSci"></div>
+          <div class="nhc-score" id="nhcScore"></div>
+          <div class="nhc-reasons" id="nhcReasons"></div>
+          <div class="nhc-action">
+            <span data-en="Click node to explore plant &rarr;" data-kn="ಸಸ್ಯದ ವಿವರ ನೋಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ &rarr;">Click node to explore plant &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+  </main>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-title">🌿 VanaOshadhi — <span data-en="Medicinal Plants Encyclopedia" data-kn="ಔಷಧೀಯ ಸಸ್ಯಗಳ ವಿಶ್ವಕೋಶ">Medicinal Plants Encyclopedia</span></p>
+      <p class="footer-sub">A Digital Encyclopedia of 80 Medicinal Plants &nbsp;|&nbsp; Exploring Ayurvedic Wisdom Through Technology</p>
+      <p class="footer-disclaimer-small" data-en="Disclaimer: Educational and research purpose only. Not intended as medical advice." data-kn="ಸೂಚನೆ: ಶೈಕ್ಷಣಿಕ ಮತ್ತು ಸಂಶೋಧನಾ ಉದ್ದೇಶಗಳಿಗಾಗಿ ಮಾತ್ರ. ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆಯಲ್ಲ.">
+        Disclaimer: Educational and research purpose only. Not intended as medical advice.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Jinja → JS bridge -->
+  <script>
+    const PLANT_DATA = {
+      id:          {{ plant.id | tojson }},
+      name:        {{ plant.name | tojson }},
+      kannadaName: {{ plant.kannada_name | tojson }},
+      scientific:  {{ plant.scientific_name | tojson }},
+      use:         {{ plant.use | tojson }},
+      useKannada:  {{ plant.use_kannada | tojson }},
+      funFact:     {{ plant.fun_fact | tojson }},
+      images:      {{ plant.images | tojson }}
+    };
+
+    const RELATED_DATA = [
+      {% if related_plants %}
+      {% for rel in related_plants %}
+      {% set p_item = rel.plant if rel.plant is defined else rel %}
+      {
+        id:          {{ p_item.id | tojson }},
+        name:        {{ p_item.name | tojson }},
+        kannadaName: {{ p_item.kannada_name | tojson }},
+        scientific:  {{ p_item.scientific_name | tojson }},
+        family:      {{ p_item.family | tojson }},
+        type:        {{ p_item.plant_type | tojson }},
+        image:       {{ url_for('static', filename='images/' + p_item.images[0]) | tojson }},
+        score:       {{ (rel.similarity_score if rel.similarity_score is defined else 70) | tojson }},
+        reasons:     {{ (rel.reasons if rel.reasons is defined else []) | tojson }}
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+      {% endif %}
+    ];
+  </script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
